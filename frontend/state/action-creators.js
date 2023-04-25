@@ -8,6 +8,8 @@ export const FETCH_QUIZ = 'FETCH_QUIZ';
 export const SET_QUIZ = 'SET_QUIZ';
 export const FETCH_QUIZ_FAILURE = 'FETCH_QUIZ_FAILURE';
 export const SET_MESSAGE = 'SET_MESSAGE';
+export const INPUT_CHANGE = 'INPUT_CHANGE';
+export const RESET_FORM = 'RESET_FORM';
 
 
 // ❗ You don't need to add extra action creators to achieve MVP
@@ -42,9 +44,18 @@ export function setQuiz() {
   }
  }
 
-export function inputChange() { }
+export function inputChange(field, value) {
+  return {
+    type: INPUT_CHANGE,
+    payload: { [field]: value}
+  }
+ }
 
-export function resetForm() { }
+export function resetForm() {
+  return {
+    type: RESET_FORM
+  }
+ }
 
 // ❗ Async action creators
 export function fetchQuiz() {
@@ -56,7 +67,6 @@ export function fetchQuiz() {
     dispatch({type: FETCH_QUIZ});
     axios.get(url)
       .then(res => {
-        console.log(res.data)
         dispatch({type: SET_QUIZ, payload: res.data});
       })
       .catch(err => {
@@ -76,13 +86,25 @@ export function postAnswer(quiz, answer) {
         dispatch({type: SET_MESSAGE, payload: res.data.message});
         dispatch(fetchQuiz());
       })
+      .catch(err => {
+        dispatch({type: SET_MESSAGE, payload: err.message});
+      })
   }
 }
-export function postQuiz() {
+export function postQuiz(question, trueAnswer, falseAnswer) {
   return function (dispatch) {
     // On successful POST:
     // - Dispatch the correct message to the the appropriate state
     // - Dispatch the resetting of the form
+    axios.post('http://localhost:9000/api/quiz/new', {question_text: question, true_answer_text: trueAnswer, false_answer_text: falseAnswer})
+      .then(res => {
+        dispatch({type: SET_MESSAGE, payload: `Congrats: "${question}" is a great question!`});
+        dispatch(resetForm());
+      })
+      .catch(err => {
+        console.error(err.message)
+        dispatch({type: SET_MESSAGE, payload: err.message});
+      })
   }
 }
 // ❗ On promise rejections, use log statements or breakpoints, and put an appropriate error message in state

@@ -7,6 +7,8 @@ import {
   FETCH_QUIZ_FAILURE,
   SELECT_ANSWER,
   SET_MESSAGE,
+  INPUT_CHANGE,
+  RESET_FORM
   } from './action-creators'
 
 // ❗ You don't need to add extra reducers to achieve MVP
@@ -70,6 +72,12 @@ const initialFormState = {
   newFalseAnswer: '',
 }
 function form(state = initialFormState, action) {
+  switch(action.type){
+    case INPUT_CHANGE:
+      return {...state, ...action.payload}
+    case RESET_FORM:
+      return {...state, newQuestion: '', newTrueAnswer: '', newFalseAnswer: ''}
+  }
   return state
 }
 
